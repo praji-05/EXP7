@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loan Eligibility Checker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f3ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      width: 400px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 15px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 5px;
+    }
+    button {
+      width: 100%;
+      margin-top: 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .result {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    .eligible {
+      color: green;
+    }
+    .not-eligible {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Loan Eligibility Checker</h2>
+    <label>Name:</label>
+    <input type="text" id="name" placeholder="Enter your name">
+
+    <label>Age:</label>
+    <input type="number" id="age" placeholder="Enter your age">
+
+    <label>Monthly Salary:</label>
+    <input type="number" id="salary" placeholder="Enter monthly salary">
+
+    <label>Existing EMI/Debts:</label>
+    <input type="number" id="emi" placeholder="Enter existing EMI">
+
+    <label>Loan Amount Requested:</label>
+    <input type="number" id="loan" placeholder="Enter loan amount">
+
+    <button onclick="checkEligibility()">Check Loan Eligibility</button>
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    function checkEligibility() {
+      const name = document.getElementById('name').value.trim();
+      const age = parseInt(document.getElementById('age').value);
+      const salary = parseFloat(document.getElementById('salary').value);
+      const emi = parseFloat(document.getElementById('emi').value);
+      const loan = parseFloat(document.getElementById('loan').value);
+      const resultDiv = document.getElementById('result');
+
+      // Validate input
+      if (!name || isNaN(age) || isNaN(salary) || isNaN(emi) || isNaN(loan)) {
+        resultDiv.innerHTML = "⚠️ Please fill all fields with valid values.";
+        resultDiv.className = "result not-eligible";
+        return;
+      }
+
+      // Calculate Debt-to-Income Ratio (DTI)
+      const proposedEMI = loan / 12; // assume 1-year loan period
+      const DTI = ((emi + proposedEMI) / salary) * 100;
+
+      let message = "";
+      let eligible = true;
+
+      // Check conditions
+      if (age < 21 || age > 60) {
+        message += "❌ Age must be between 21 and 60.<br>";
+        eligible = false;
+      }
+      if (DTI > 60) {
+        message += `❌ DTI (${DTI.toFixed(2)}%) exceeds 60%.<br>`;
+        eligible = false;
+      }
+      if (loan > 10 * salary) {
+        message += "❌ Loan amount exceeds 10 × Monthly Salary.<br>";
+        eligible = false;
+      }
+
+      if (eligible) {
+        resultDiv.innerHTML = `✅ ${name}, you are <span class='eligible'>Eligible</span> for the loan!<br>DTI: ${DTI.toFixed(2)}%`;
+        resultDiv.className = "result eligible";
+      } else {
+        resultDiv.innerHTML = `🚫 ${name}, you are <span class='not-eligible'>Not Eligible</span>.<br>${message}`;
+        resultDiv.className = "result not-eligible";
+      }
+    }
+  </script>
+</body>
+</html>
